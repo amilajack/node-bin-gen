@@ -22,7 +22,7 @@
     "yargs": "^11.0.0"
   },
   "scripts": {
-    "test": "./index 10.8.0"
+    "test": "./index.js 10.8.0"
   },
   "eslintConfig": {
     "parserOptions": {
