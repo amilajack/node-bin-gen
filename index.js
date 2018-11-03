@@ -74,7 +74,7 @@ async function buildArchPackage(os, cpu, version, pre) {
 
   debug('removing', dir)
   await rimraf(dir, { glob: false })
-  await mkdir(dir).catch(e => {
+  await mkdir(dir, { recursive: true }).catch(e => {
       if (e.code != 'EEXIST') throw e
     })
 
@@ -169,7 +169,7 @@ async function main() {
   const pkg = buildMetapackage(version + (pre != null ? '-' + pre : ''))
 
   try {
-    await mkdir(pkg.name)
+    await mkdir(pkg.name, { recursive: true })
   } catch(err) {
     if (err && err.code != 'EEXIST') {
       throw err
