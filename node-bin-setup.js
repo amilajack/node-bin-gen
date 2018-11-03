@@ -2,6 +2,17 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
+function linkSync(src, dest) {
+  try {
+    fs.unlinkSync(dest);
+  } catch (e) {
+    if (e.code !== 'ENOENT') {
+      throw e;
+    }
+  }
+  return fs.linkSync(src, dest);
+}
+
 function installArchSpecificPackage(scope = undefined, packageName = 'node', version, require) {
   process.env.npm_config_global = 'false';
 
@@ -58,17 +69,6 @@ function installArchSpecificPackage(scope = undefined, packageName = 'node', ver
 
     return process.exit(code);
   });
-}
-
-function linkSync(src, dest) {
-  try {
-    fs.unlinkSync(dest);
-  } catch (e) {
-    if (e.code !== 'ENOENT') {
-      throw e;
-    }
-  }
-  return fs.linkSync(src, dest);
 }
 
 module.exports = installArchSpecificPackage;
