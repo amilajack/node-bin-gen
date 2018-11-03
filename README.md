@@ -1,5 +1,7 @@
 # node-bin-gen
 
+[![Build Status](https://travis-ci.org/amilajack/node-bin-gen.svg?branch=master)](https://travis-ci.org/amilajack/node-bin-gen)
+
 Generate a node binary package
 
 # Install
@@ -24,4 +26,4 @@ This package generates a `node-bin` or `iojs-bin` package, and all of the `node-
 
 # License
 
-ISC
+MIT
