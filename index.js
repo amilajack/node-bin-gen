@@ -88,7 +88,8 @@ async function buildArchPackage(os, cpu, version, pre) {
     cpu: arch,
     publishConfig: {
       access: 'public'
-    }
+    },
+    license: 'MIT'
   };
 
   debug('removing', dir);
