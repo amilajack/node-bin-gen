@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-'use strict';
-
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -11,8 +9,10 @@ const { spawn } = require('child_process');
 const yargs = require('yargs');
 
 const execFile = util.promisify(require('child_process').execFile);
+
 const unlink = util.promisify(fs.unlink);
 const shell = require('shelljs');
+
 const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
 const fetch = require('make-fetch-happen').defaults({
@@ -28,6 +28,11 @@ yargs.option('skip-binaries', {
   boolean: true
 });
 yargs.option('only', { describe: 'Only download this binary package' });
+yargs.option('scope', {
+  alias: 's',
+  describe: 'The scope the package will be published under',
+  default: undefined
+});
 yargs.option('package-name', {
   alias: 'n',
   describe: 'Use this as the main package name',
@@ -41,38 +46,39 @@ yargs.demandCommand(
 );
 yargs.help('help').wrap(76);
 
-const argv = yargs.argv;
+const {argv} = yargs;
 
 const versionprime = argv._[0];
 const pre = argv._[1];
+const suffixedScope = argv.scope ? `${argv.scope}/` : '';
 
 if (!versionprime) {
-  console.warn('Use: ' + argv.$0 + ' version [pre]');
+  console.warn(`Use: ${  argv.$0  } version [pre]`);
   process.exit(1);
   return;
 }
 
-const version = versionprime[0] != 'v' ? 'v' + versionprime : version;
+const version = versionprime[0] !== 'v' ? `v${  versionprime}` : version;
 
 async function buildArchPackage(os, cpu, version, pre) {
   debug('building architecture specific package', os, cpu, version, pre);
 
-  const platform = os == 'win' ? 'win32' : os;
-  const arch = os == 'win' && cpu == 'ia32' ? 'x86' : cpu;
-  const executable = os == 'win' ? 'bin/node.exe' : 'bin/node';
+  const platform = os === 'win' ? 'win32' : os;
+  const arch = os === 'win' && cpu === 'ia32' ? 'x86' : cpu;
+  const executable = os === 'win' ? 'bin/node.exe' : 'bin/node';
 
-  const dir = 'node-' + os + '-' + cpu;
-  const base = 'node-' + version + '-' + os + '-' + cpu;
-  const filename = base + (os == 'win' ? '.zip' : '.tar.gz');
+  const dir = path.join(__dirname, 'packages', `node-${  os  }-${  cpu}`);
+  const base = `node-${  version  }-${  os  }-${  cpu}`;
+  const filename = base + (os === 'win' ? '.zip' : '.tar.gz');
   const pkg = {
-    name: 'node' + '-' + os + '-' + cpu,
-    version: version + (pre != null ? '-' + pre : ''),
+    name: [`${suffixedScope}${argv['package-name']}`, os, cpu].join('-'),
+    version: version + (pre != null ? `-${  pre}` : ''),
     description: 'node',
     bin: {
       node: executable
     },
     files: [
-      os == 'win' ? 'bin/node.exe' : 'bin/node',
+      os === 'win' ? 'bin/node.exe' : 'bin/node',
       'share',
       'include',
       '*.md',
@@ -87,27 +93,27 @@ async function buildArchPackage(os, cpu, version, pre) {
   shell.mkdir('-p', dir);
 
   const url =
-    'https://nodejs.org' +
-    (/rc/.test(version)
+    `https://nodejs.org${ 
+    /rc/.test(version)
       ? '/download/rc/'
       : /test/.test(version)
         ? '/download/test/'
-        : '/dist/') +
-    version +
-    '/' +
-    filename;
+        : '/dist/' 
+    }${version 
+    }/${ 
+    filename}`;
 
   debug('Fetching', url);
 
   const res = await fetch(url);
 
-  if (res.status != 200 && res.status != 304) {
+  if (res.status !== 200 && res.status !== 304) {
     throw new VError('not ok: fetching %j got status code %s', url, res.status);
   }
 
   debug('Unpacking into', dir);
 
-  if (os == 'win') {
+  if (os === 'win') {
     const f = fs.createWriteStream(filename);
     const written = pump(res.body, f);
     const closed = eos(f);
@@ -138,28 +144,46 @@ async function fetchManifest(version) {
   const url = (function() {
     if (/rc/.test(version)) {
       return `${base}/download/rc/index.json`;
-    } else if (/test/.test(version)) {
+    } if (/test/.test(version)) {
       return `${base}/download/test/index.json`;
-    } else {
+    } 
       return `${base}/dist/index.json`;
-    }
+    
   })();
   const res = await fetch(url);
   return res.json();
 }
 
-main().catch(err => {
-  console.warn(err.stack);
-  process.exit(1);
-});
+function buildMetapackage(version) {
+  console.log([suffixedScope, argv['package-name']].join(''))
+  const pkg = {
+    name: [suffixedScope, argv['package-name']].join(''),
+    version: version.replace(/^v/, ''),
+    description: 'node',
+    main: 'index.js',
+    keywords: ['runtime'],
+    repository: require('./package.json').repository,
+    scripts: {
+      install: 'node installArchSpecificPackage'
+    },
+    bin: {
+      node: 'bin/node'
+    },
+    license: 'MIT',
+    author: '',
+    engines: {
+      npm: '>=5.0.0'
+    }
+  };
+
+  return pkg;
+}
 
 async function main() {
   const manifest = argv['skip-binaries'] ? [] : await fetchManifest(version);
 
   const v = manifest
-    .filter(function(ver) {
-      return ver.version == version;
-    })
+    .filter((ver) => ver.version === version)
     .shift();
 
   if (!v) {
@@ -187,14 +211,12 @@ async function main() {
   const files = argv.only ? [argv.only] : v.files;
 
   const binaries = files
-    .filter(function(f) {
-      return (
+    .filter((f) => (
         !/^headers|^src/.test(f) &&
         !/pkg$/.test(f) &&
         !/^win-...-(exe|msi|7z)/.test(f)
-      );
-    })
-    .map(function(f) {
+      ))
+    .map((f) => {
       const bits = f.split('-');
       return {
         os: bits[0].replace(/^osx$/, 'darwin'),
@@ -207,51 +229,32 @@ async function main() {
     binaries.map(v => buildArchPackage(v.os, v.cpu, version, pre))
   );
 
-  const pkg = buildMetapackage(version + (pre != null ? '-' + pre : ''));
+  const pkg = buildMetapackage(version + (pre != null ? `-${  pre}` : ''));
 
-  shell.mkdir('-p', pkg.name);
+  const nodePkgDir = path.join(__dirname, 'packages', argv['package-name']);
+  shell.mkdir('-p',  nodePkgDir);
 
-  const script = `require('node-bin-setup')("${pkg.version}", require)`;
+  const script = `require('./node-bin-setup')('${suffixedScope}${argv['package-name']}', '${pkg.version}', require)`;
+  const nodeBinSetupScript = fs.readFileSync(require.resolve('./node-bin-setup')).toString();
 
   await Promise.all([
-    readFile(path.resolve(__dirname, 'node-bin-README.md'), 'utf8').then(
+    readFile(path.join(__dirname, 'node-bin-README.md'), 'utf8').then(
       readme =>
         writeFile(
-          path.resolve(pkg.name, 'README.md'),
+          path.join(nodePkgDir, 'README.md'),
           readme.replace(/\$\{packagename\}/g, pkg.name)
         )
     ),
     writeFile(
-      path.resolve(pkg.name, 'package.json'),
+      path.join(nodePkgDir, 'package.json'),
       JSON.stringify(pkg, null, 2)
     ),
-    writeFile(path.resolve(pkg.name, 'installArchSpecificPackage.js'), script)
+    writeFile(path.join(nodePkgDir, 'installArchSpecificPackage.js'), script),
+    writeFile(path.join(nodePkgDir, 'node-bin-setup.js'), nodeBinSetupScript)
   ]);
 }
 
-function buildMetapackage(version) {
-  const pkg = {
-    name: argv['package-name'],
-    version: version.replace(/^v/, ''),
-    description: 'node',
-    main: 'index.js',
-    keywords: ['runtime'],
-    repository: require('./package.json').repository,
-    scripts: {
-      install: 'node installArchSpecificPackage'
-    },
-    bin: {
-      node: 'bin/node'
-    },
-    dependencies: {
-      'node-bin-setup': '^1.0.0'
-    },
-    license: 'ISC',
-    author: '',
-    engines: {
-      npm: '>=5.0.0'
-    }
-  };
-
-  return pkg;
-}
+main().catch(err => {
+  console.warn(err.stack);
+  process.exit(1);
+});

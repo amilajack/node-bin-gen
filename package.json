@@ -1,5 +1,5 @@
 {
-  "name": "node-bin-gen",
+  "name": "@amilajack/node-bin-gen",
   "version": "9.0.2",
   "description": "Generate a node binary package",
   "author": "Amila Welihinda <amilajack@gmail.com>",
@@ -23,29 +23,20 @@
     "yargs": "^12.0.2"
   },
   "scripts": {
-    "build": "./index.js 10.8.0 --package-name @amilajack/node",
+    "build": "./index.js 10.8.0 --scope @amilajack",
+    "clean": "rm -rf packages",
+    "publish": "lerna publish",
+    "lint": "eslint index.js node-bin-setup.js",
     "test": "yarn build"
   },
   "eslintConfig": {
-    "parserOptions": {
-      "ecmaVersion": 8
-    },
-    "rules": {
-      "valid-typeof": "error",
-      "no-undef": "error",
-      "no-unused-vars": "error",
-      "no-process-exit": 0,
-      "no-shadow": 0,
-      "strict": 0,
-      "eqeqeq": 0,
-      "curly": 0
-    },
-    "env": {
-      "node": true,
-      "es6": true
-    }
+    "extends": "bliss"
   },
   "devDependencies": {
-    "jest": "^23.6.0"
-  }
+    "eslint": "^5.8.0",
+    "eslint-config-bliss": "^3.0.0",
+    "jest": "^23.6.0",
+    "lerna": "^3.4.3"
+  },
+  "private": false
 }
