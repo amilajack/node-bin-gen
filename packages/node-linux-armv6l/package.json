@@ -1,0 +1,21 @@
+{
+  "name": "@amilajack/node-linux-armv6l",
+  "version": "10.1.1-alpha.0",
+  "description": "node",
+  "bin": {
+    "node": "bin/node"
+  },
+  "files": [
+    "bin/node",
+    "share",
+    "include",
+    "*.md",
+    "LICENSE"
+  ],
+  "os": "linux",
+  "cpu": "armv6l",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}

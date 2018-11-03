@@ -1,0 +1,21 @@
+{
+  "name": "@amilajack/node-aix-ppc64",
+  "version": "10.1.1-alpha.0",
+  "description": "node",
+  "bin": {
+    "node": "bin/node"
+  },
+  "files": [
+    "bin/node",
+    "share",
+    "include",
+    "*.md",
+    "LICENSE"
+  ],
+  "os": "aix",
+  "cpu": "ppc64",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}

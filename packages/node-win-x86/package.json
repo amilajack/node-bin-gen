@@ -1,0 +1,21 @@
+{
+  "name": "@amilajack/node-win-x86",
+  "version": "10.1.1-alpha.0",
+  "description": "node",
+  "bin": {
+    "node": "bin/node.exe"
+  },
+  "files": [
+    "bin/node.exe",
+    "share",
+    "include",
+    "*.md",
+    "LICENSE"
+  ],
+  "os": "win32",
+  "cpu": "x86",
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT"
+}

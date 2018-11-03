@@ -1,0 +1,27 @@
+{
+  "name": "@amilajack/node",
+  "version": "10.1.1-alpha.0",
+  "description": "node",
+  "main": "index.js",
+  "keywords": [
+    "runtime"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amilajack/node-bin-gen"
+  },
+  "scripts": {
+    "install": "node installArchSpecificPackage"
+  },
+  "bin": {
+    "node": "bin/node"
+  },
+  "license": "MIT",
+  "author": "",
+  "engines": {
+    "npm": ">=5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
