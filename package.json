@@ -1,6 +1,6 @@
 {
   "name": "@amilajack/node-bin-gen",
-  "version": "9.0.2",
+  "version": "10.1.0",
   "description": "Generate a node binary package",
   "author": "Amila Welihinda <amilajack@gmail.com>",
   "main": "index.js",
@@ -23,7 +23,7 @@
     "yargs": "^12.0.2"
   },
   "scripts": {
-    "build": "./index.js 10.8.0 --scope @amilajack",
+    "build": "./index.js 10.1.0 --scope @amilajack",
     "clean": "rm -rf packages",
     "publish": "lerna publish",
     "lint": "eslint index.js node-bin-setup.js",
