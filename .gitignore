@@ -39,3 +39,8 @@ target
 index.node
 artifacts.json
 package-lock.json
+
+packages/**/share
+packages/**/lib
+packages/**/include
+packages/**/bin
