@@ -1,6 +1,6 @@
 {
   "name": "@amilajack/node-linux-armv7l",
-  "version": "10.1.1-alpha.0",
+  "version": "10.1.1-alpha.1",
   "description": "node",
   "bin": {
     "node": "bin/node"
