@@ -67,12 +67,12 @@ async function buildArchPackage(os, cpu, version, pre) {
   const arch = os === 'win' && cpu === 'ia32' ? 'x86' : cpu;
   const executable = os === 'win' ? 'bin/node.exe' : 'bin/node';
 
-  const dir = path.join(__dirname, 'packages', `node-${  os  }-${  cpu}`);
-  const base = `node-${  version  }-${  os  }-${  cpu}`;
+  const dir = path.join(__dirname, 'packages', `node-${os}-${cpu}`);
+  const base = `node-${version}-${os}-${cpu}`;
   const filename = base + (os === 'win' ? '.zip' : '.tar.gz');
   const pkg = {
     name: [`${suffixedScope}${argv['package-name']}`, os, cpu].join('-'),
-    version: version + (pre != null ? `-${  pre}` : ''),
+    version: version + (pre != null ? `-${pre}` : ''),
     description: 'node',
     bin: {
       node: executable
