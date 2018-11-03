@@ -85,7 +85,10 @@ async function buildArchPackage(os, cpu, version, pre) {
       'LICENSE'
     ],
     os: platform,
-    cpu: arch
+    cpu: arch,
+    publishConfig: {
+      access: 'public'
+    }
   };
 
   debug('removing', dir);
@@ -173,6 +176,9 @@ function buildMetapackage(version) {
     author: '',
     engines: {
       npm: '>=5.0.0'
+    },
+    publishConfig: {
+      access: 'public'
     }
   };
 
