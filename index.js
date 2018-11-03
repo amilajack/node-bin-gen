@@ -241,7 +241,7 @@ async function main() {
   const nodePkgDir = path.join(__dirname, 'packages', argv['package-name']);
   shell.mkdir('-p',  nodePkgDir);
 
-  const script = `require('./node-bin-setup')('${suffixedScope}${argv['package-name']}', '${pkg.version}', require)`;
+  const script = `require('./node-bin-setup')(${suffixedScope}, ${argv['package-name']}, '${pkg.version}', require)`;
   const nodeBinSetupScript = fs.readFileSync(require.resolve('./node-bin-setup')).toString();
 
   await Promise.all([
