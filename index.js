@@ -197,7 +197,7 @@ function buildMetapackage(version) {
     ],
     "repository": require('./package.json').repository,
     "scripts": {
-      "preinstall": "node installArchSpecificPackage"
+      "install": "node installArchSpecificPackage"
     },
     "bin": {
       "node": "bin/node"
